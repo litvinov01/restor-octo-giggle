@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  server:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.server
+    container_name: restor-octo-giggle-server
+    ports:
+      - "49152:49152"
+    environment:
+      - TRANSPORT_ADDRESS=0.0.0.0:49152
+    restart: unless-stopped
+    networks:
+      - restor-octo-giggle-network
+
+networks:
+  restor-octo-giggle-network:
+    driver: bridge

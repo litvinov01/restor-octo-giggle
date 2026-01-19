@@ -1,0 +1,10 @@
+target/
+.git/
+.gitignore
+*.md
+drivers/
+scripts/
+.github/
+dist/
+*.exe
+*.pdb
