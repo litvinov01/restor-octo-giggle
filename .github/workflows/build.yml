@@ -57,26 +57,26 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-            rust_samples/target/
+            target/
           key: ${{ runner.os }}-cargo-${{ matrix.target }}-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-${{ matrix.target }}-
 
       - name: Build
-        working-directory: rust_samples
+        working-directory: rog
         run: cargo build --release --target ${{ matrix.target }}
 
       - name: Strip binary (Linux/macOS)
         if: runner.os != 'Windows'
         run: |
-          strip rust_samples/target/${{ matrix.target }}/release/rust_samples${{ matrix.artifact_ext }}
+          strip rog/target/${{ matrix.target }}/release/rog${{ matrix.artifact_ext }}
         continue-on-error: true
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: restor-octo-giggle-${{ matrix.artifact_name }}
-          path: rust_samples/target/${{ matrix.target }}/release/rust_samples${{ matrix.artifact_ext }}
+          path: rog/target/${{ matrix.target }}/release/rog${{ matrix.artifact_ext }}
 
   package:
     name: Package Release
@@ -101,9 +101,9 @@ jobs:
           # Package each artifact
           for artifact in artifacts/*/; do
             name=$(basename "$artifact")
-            binary="$artifact/rust_samples"
+            binary="$artifact/rog"
             if [ ! -f "$binary" ]; then
-              binary="$artifact/rust_samples.exe"
+              binary="$artifact/rog.exe"
             fi
             
             if [ -f "$binary" ]; then
@@ -116,7 +116,7 @@ jobs:
               if [[ "$platform" == *"windows"* ]]; then
                 mv "dist/$pkg_name/restor-octo-giggle" "dist/$pkg_name/restor-octo-giggle.exe"
               fi
-              cp rust_samples/README.md "dist/$pkg_name/" 2>/dev/null || true
+              cp rog/README.md "dist/$pkg_name/" 2>/dev/null || true
               
               # Create archive
               if [[ "$platform" == *"windows"* ]]; then
@@ -146,13 +146,13 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Run tests
-        working-directory: rust_samples
+        working-directory: rog
         run: cargo test
 
       - name: Check formatting
-        working-directory: rust_samples
+        working-directory: rog
         run: cargo fmt -- --check
 
       - name: Clippy
-        working-directory: rust_samples
+        working-directory: rog
         run: cargo clippy -- -D warnings
