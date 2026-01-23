@@ -1,0 +1,208 @@
+# Core Application (Rust) - Cursor Rules
+
+## Project Context
+
+This is the **core transport server** for restor-octo-giggle. It's a **high-performance Rust application** that provides message routing and event-based distribution for cross-application communication.
+
+## Purpose
+
+The core application provides:
+- **Message consumption** - Receive messages from producers
+- **Event routing** - Route messages by event name to subscribed consumers
+- **Producer pool management** - Manage external consumer connections
+- **Registration server** - Runtime consumer registration
+- **Protocol abstraction** - Support multiple transport protocols
+
+## Architecture
+
+### Core Components
+
+1. **Transport Server** (`src/transport/transport_server.rs`)
+   - Main server that manages protocol and message consumption
+   - Handles protocol initialization
+
+2. **Protocols** (`src/transport/protocols/`)
+   - TCP protocol implementation
+   - Extensible trait-based design
+   - Future: UDP, WebSocket support
+
+3. **Producer Pool** (`src/transport/producers/`)
+   - Manages external consumer connections
+   - Event-based subscription system
+   - Observer pattern implementation
+
+4. **Registration Server** (`src/transport/registration_server.rs`)
+   - Runtime consumer registration
+   - Event subscription management
+   - Producer lifecycle management
+
+5. **Message Handling** (`src/transport/message.rs`)
+   - Event message parsing (JSON, simple format)
+   - Message routing logic
+
+6. **Server** (`src/transport/server.rs`)
+   - High-level server abstraction
+   - Configuration management
+   - Protocol factory integration
+
+## Key Design Principles
+
+1. **Protocol Abstraction** - Use traits for protocol extensibility
+2. **Event-Driven** - Route by event name, not destination
+3. **Thread Safety** - Use Arc, Mutex for shared state
+4. **Error Handling** - Comprehensive error handling with clear messages
+5. **Performance** - Optimize for high-throughput message routing
+6. **Extensibility** - Easy to add new protocols and features
+
+## File Structure
+
+```
+rust_samples/
+├── src/
+│   ├── main.rs                    # Main application entry
+│   ├── test_consumer_server.rs    # Test consumer server binary
+│   ├── boot/
+│   │   └── mod.rs                # Bootstrap initialization
+│   └── transport/
+│       ├── mod.rs                 # Module exports
+│       ├── server.rs              # High-level server
+│       ├── transport_server.rs    # Transport server
+│       ├── transport_interface.rs # Traits and interfaces
+│       ├── bind_transaport.rs     # Server binding functions
+│       ├── server_config.rs       # Configuration
+│       ├── message.rs             # Message parsing
+│       ├── registration_server.rs  # Registration server
+│       ├── protocol_factory.rs    # Protocol factory
+│       ├── protocols/             # Protocol implementations
+│       │   ├── tcp.rs
+│       │   └── mod.rs
+│       ├── clients/               # Client implementations
+│       │   ├── tcp.rs
+│       │   └── mod.rs
+│       ├── producers/             # Producer pool system
+│       │   ├── producer.rs
+│       │   ├── producer_pool.rs
+│       │   ├── producer_registry.rs
+│       │   ├── producer_factory.rs
+│       │   ├── producer_helpers.rs
+│       │   ├── observer.rs
+│       │   └── mod.rs
+│       └── client_interface.rs    # Client trait
+├── docs/                          # Documentation
+│   ├── README.md                 # Documentation index
+│   ├── BUILD.md                  # Build guide
+│   ├── EVENT_ROUTING.md         # Event routing
+│   ├── INTEGRATION_TESTING.md   # Testing guide
+│   ├── PRODUCER_POOL.md         # Producer pool docs
+│   ├── TRAITS_EXPLAINED.md      # Rust traits
+│   └── WINDOWS_NETWORKING.md    # Windows setup
+└── Cargo.toml                    # Project manifest
+```
+
+## Development Guidelines
+
+### Rust Best Practices
+
+- Use ownership and borrowing correctly
+- Prefer `Result<T, E>` for error handling
+- Use `Arc<Mutex<T>>` for shared mutable state
+- Document public APIs with `///` comments
+- Use meaningful type names
+- Follow Rust naming conventions (snake_case)
+
+### Code Organization
+
+- Group related functionality in modules
+- Use traits for abstraction
+- Keep functions focused and small
+- Use `pub` carefully (only expose what's needed)
+- Organize by feature, not by type
+
+### Error Handling
+
+- Use `Result` types for fallible operations
+- Provide clear error messages
+- Use `?` operator for error propagation
+- Handle network errors gracefully
+- Log errors appropriately
+
+### Thread Safety
+
+- Use `Arc` for shared ownership
+- Use `Mutex` for shared mutable state
+- Avoid data races
+- Use channels if appropriate
+- Document thread-safety guarantees
+
+### Testing
+
+- Write unit tests in `#[cfg(test)]` modules
+- Test error paths
+- Test concurrent operations
+- Use integration tests for full flows
+- Test cross-platform compatibility
+
+## Important Notes for AI Agents
+
+1. **This is a server/library** - Designed to run continuously
+2. **Performance critical** - Optimize for message throughput
+3. **Thread-safe** - All shared state must be thread-safe
+4. **Protocol abstraction** - Use traits, not concrete types
+5. **Event-driven** - Route by event name, not direct addressing
+6. **Cross-platform** - Must work on Windows, Linux, macOS
+7. **Backward compatibility** - Don't break existing APIs
+
+## Common Tasks
+
+- Adding new transport protocols
+- Improving event routing
+- Optimizing producer pool
+- Adding new message formats
+- Performance optimization
+- Error handling improvements
+
+## Testing
+
+- Unit tests: `cargo test`
+- Integration tests: Test with JS driver
+- Test consumer server: `cargo run --bin test_consumer_server`
+- Run all tests: `cargo test --all`
+
+## When Making Changes
+
+1. **Update documentation** - Keep docs in `docs/` folder
+2. **Add tests** - Test new functionality
+3. **Consider performance** - Profile if needed
+4. **Maintain API compatibility** - Don't break existing code
+5. **Follow Rust patterns** - Use idiomatic Rust
+6. **Cross-platform test** - Test on different OS
+
+## Questions to Consider
+
+- Is this thread-safe?
+- Does this maintain protocol abstraction?
+- Is error handling comprehensive?
+- Will this impact performance?
+- Is this cross-platform compatible?
+- Is documentation updated?
+- Are there tests for this?
+
+## Protocol Extension
+
+When adding new protocols:
+
+1. Implement `TransportProtocol` trait
+2. Add to `ProtocolFactory`
+3. Update `ServerConfig` if needed
+4. Add tests
+5. Update documentation
+
+## Producer Pool Extension
+
+When extending producer pool:
+
+1. Maintain observer pattern
+2. Keep thread-safe
+3. Support event subscriptions
+4. Handle errors gracefully
+5. Update documentation
