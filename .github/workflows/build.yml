@@ -73,7 +73,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: restor-octo-giggle-${{ matrix.artifact_name }}
           path: rust_samples/target/${{ matrix.target }}/release/rust_samples${{ matrix.artifact_ext }}
